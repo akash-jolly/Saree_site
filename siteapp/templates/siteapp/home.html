@@ -1,0 +1,86 @@
+{% extends "siteapp/base.html" %}
+{% load static %}
+
+{% block title %}
+    {% if current_category %}
+        {{ current_category.name }} Sarees
+    {% else %}
+        All Sarees
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-7xl mx-auto px-6">
+    <div class="hero py-6 px-4 sm:py-8 sm:px-6 section-bg-soft">
+        <h1 class="text-3xl sm:text-4xl font-display text-accent">
+            {% if current_category %}
+                {{ current_category.name }} Sarees
+            {% else %}
+                All Sarees
+            {% endif %}
+        </h1>
+        <p class="muted mt-2">Handpicked sarees curated for you.</p>
+    </div>
+
+    <!-- thin gold divider -->
+    <div class="section-divider"></div>
+
+    <!-- Search form -->
+    <form method="get" class="search-bar flex items-center gap-3 mb-4">
+        <input type="text" name="q" placeholder="Search sarees, colors, designs..." value="{{ current_search|default:'' }}" class="search-input flex-1 px-4 py-2">
+        <button type="submit" class="rounded-full px-4 py-2 bg-[#C8A951] hover:bg-[#b08c38] text-white font-semibold transition">Search</button>
+    </form>
+
+    {% if categories %}
+        <div class="category-chips flex items-center gap-3 mb-4">
+            <span class="label">Categories:</span>
+            <a href="{% url 'home' %}" class="chip {% if not current_category %}active{% endif %}">All</a>
+            {% for cat in categories %}
+                {% if current_category and cat.id == current_category.id %}
+                    <span class="chip active">{{ cat.name }}</span>
+                {% else %}
+                    <a href="{{ cat.get_absolute_url }}" class="chip">{{ cat.name }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- thin gold divider between filters and products -->
+    <div class="section-divider"></div>
+
+    {% if products %}
+        <div class="product-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pattern-bg p-4 rounded-lg">
+            {% for product in products %}
+                <article class="product-card rounded-xl shadow-lg p-4 flex flex-col justify-between">
+                    {% if product.featured_image %}
+                        <a href="{{ product.get_absolute_url }}">
+                            <img src="{{ product.featured_image.url }}" alt="{{ product.title }}" class="w-full h-64 object-cover rounded-lg">
+                        </a>
+                    {% else %}
+                        <a href="{{ product.get_absolute_url }}">
+                            {# placeholder available at: siteapp/images/placeholder.png (kept commented) #}
+                            <div class="w-full h-64 bg-gray-100 rounded-lg"></div>
+                        </a>
+                    {% endif %}
+
+                    <div class="mt-3">
+                        <div class="title"><a href="{{ product.get_absolute_url }}" class="text-lg font-semibold text-gray-900">{{ product.title }}</a></div>
+                        <div class="meta text-sm text-gray-500">Category: {{ product.category }}</div>
+                        <div class="price text-xl font-extrabold text-accent mt-2">₹{{ product.base_price }}</div>
+                        <div class="cta mt-4">
+                            <a href="{{ product.get_absolute_url }}" class="btn-outline inline-block px-4 py-2 rounded">View</a>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        {% if current_search %}
+            <p class="muted">No products found matching "{{ current_search }}".</p>
+        {% else %}
+            <p class="muted">No products in this category.</p>
+        {% endif %}
+    {% endif %}
+</div>
+
+{% endblock %}

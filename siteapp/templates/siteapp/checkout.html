@@ -1,0 +1,99 @@
+{% extends "siteapp/base.html" %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<h1>Checkout</h1>
+
+<div class="w-full max-w-7xl mx-auto px-6 checkout-container">
+    <div class="order-summary card">
+        <h3>Order summary</h3>
+        {% if items %}
+            <div>
+                {% for item in items %}
+                    <div class="order-item">
+                        <div>{{ item.variant.product.title }} — {{ item.variant.color }} / {{ item.variant.get_blouse_option_display }} (x{{ item.quantity }})</div>
+                        <div class="item-price">₹{{ item.subtotal }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="cart-summary">
+                <div class="subtotal">Total: ₹{{ total }}</div>
+            </div>
+        {% else %}
+            <p class="muted">No items in cart.</p>
+        {% endif %}
+    </div>
+
+    <div class="shipping-details card">
+        <h3>Shipping details</h3>
+
+        {% if form.non_field_errors %}
+            <div class="notification error">
+                {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                {{ form.name.label_tag }}
+                {{ form.name }}
+                {% if form.name.errors %}
+                    <div class="notification error">{{ form.name.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.phone.label_tag }}
+                {{ form.phone }}
+                {% if form.phone.errors %}
+                    <div class="notification error">{{ form.phone.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.address_line1.label_tag }}
+                {{ form.address_line1 }}
+                {% if form.address_line1.errors %}
+                    <div class="notification error">{{ form.address_line1.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.address_line2.label_tag }}
+                {{ form.address_line2 }}
+                {% if form.address_line2.errors %}
+                    <div class="notification error">{{ form.address_line2.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form.city.label_tag }}
+                    {{ form.city }}
+                    {% if form.city.errors %}
+                        <div class="notification error">{{ form.city.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.pincode.label_tag }}
+                    {{ form.pincode }}
+                    {% if form.pincode.errors %}
+                        <div class="notification error">{{ form.pincode.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="submit" class="btn-primary">Place Order</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

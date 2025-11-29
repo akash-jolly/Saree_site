@@ -1,0 +1,69 @@
+{% extends "siteapp/base.html" %}
+
+{% block title %}Your Cart{% endblock %}
+
+{% block content %}
+<h1>Your Cart</h1>
+
+{% if items %}
+    <div class="card">
+        {% for item in items %}
+            <div class="cart-item">
+                <div class="cart-item-details">
+                    <h3>{{ item.variant.product.title }}</h3>
+                    <div class="muted">Color: {{ item.variant.color }}</div>
+                    <div class="muted">Blouse: {{ item.variant.get_blouse_option_display }}</div>
+                    <div class="item-price">Price: ₹{{ item.variant.price }}</div>
+                </div>
+
+                <div class="cart-item-actions">
+                    <div class="quantity-control">
+                        <form method="POST" action="{% url 'update_cart_quantity' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="variant_id" value="{{ item.variant.id }}">
+                            <input type="hidden" name="action" value="dec">
+                            <button type="submit" class="btn-outline">-</button>
+                        </form>
+
+                        <input type="text" value="{{ item.quantity }}" readonly title="Quantity for {{ item.variant.product.title }}" aria-label="Quantity for {{ item.variant.product.title }}">
+
+                        <form method="POST" action="{% url 'update_cart_quantity' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="variant_id" value="{{ item.variant.id }}">
+                            <input type="hidden" name="action" value="inc">
+                            <button type="submit" class="btn-outline">+</button>
+                        </form>
+                    </div>
+
+                    <div class="muted">Subtotal: ₹{{ item.subtotal }}</div>
+
+                    <form method="POST" action="{% url 'remove_from_cart' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="variant_id" value="{{ item.variant.id }}">
+                        <button type="submit" class="btn-outline">Remove</button>
+                    </form>
+                </div>
+            </div>
+            <hr>
+        {% endfor %}
+
+        <div class="cart-summary">
+            <div class="subtotal">Total: ₹{{ total }}</div>
+            <div class="cart-actions">
+                <form method="POST" action="{% url 'clear_cart' %}">{% csrf_token %}
+                    <button type="submit" class="btn-outline">Clear Cart</button>
+                </form>
+
+                <a href="{% url 'checkout' %}" class="btn-primary">Proceed to checkout</a>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="empty-state">
+        <h2>Your cart is empty.</h2>
+        <p class="muted">Browse our collection and add beautiful sarees to your cart.</p>
+        <p><a href="{% url 'home' %}" class="btn-outline">Continue shopping</a></p>
+    </div>
+{% endif %}
+
+{% endblock %}

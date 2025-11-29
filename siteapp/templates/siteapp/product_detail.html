@@ -1,0 +1,53 @@
+{% extends "siteapp/base.html" %}
+
+{% block title %}{{ product.title }}{% endblock %}
+
+{% block content %}
+<div class="product-detail grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="image-gallery">
+        {% if product.featured_image %}
+            <img src="{{ product.featured_image.url }}" alt="{{ product.title }}" class="w-full h-96 object-cover rounded-lg">
+        {% else %}
+            {# Placeholder image is available at: 'siteapp/images/placeholder.png' - uncomment to enable #}
+            {# <img src="{% static 'siteapp/images/placeholder.png' %}" alt="{{ product.title }}" class="w-full h-96 object-cover rounded-lg"> #}
+            <div class="no-image w-full h-96 bg-gray-100 rounded-lg" aria-hidden="true"></div>
+        {% endif %}
+    </div>
+
+    <div>
+        <h1 class="text-2xl font-display">{{ product.title }}</h1>
+        <p class="meta text-sm text-gray-500">Category: {{ product.category }}</p>
+        <div class="price text-2xl font-extrabold text-accent">₹{{ product.base_price }}</div>
+        <p class="muted mt-3">{{ product.description }}</p>
+
+        <div class="card mt-6">
+            <h3 class="text-lg font-semibold">Variants</h3>
+            {% if variants %}
+                <div class="variant-selector">
+                    {% for v in variants %}
+                        <div class="variant">
+                            <!-- <div class="variant-option">Color: {{ v.color|default:"(no color)" }}</div> -->
+                            <div class="muted">Blouse: {{ v.get_blouse_option_display }}</div>
+                            <div class="item-price">Price: ₹{{ v.price }}</div>
+                            <div class="muted">Stock: {{ v.stock }}</div>
+
+                            {% if v.stock <= 0 %}
+                                <div class="notification error">Out of stock</div>
+                            {% else %}
+                                <form method="POST" action="{% url 'add_to_cart' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="variant_id" value="{{ v.id }}">
+                                    <button type="submit" class="btn-primary px-4 py-2 rounded">Add to Cart</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="muted">No variants available for this product.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

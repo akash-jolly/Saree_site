@@ -1,0 +1,35 @@
+{% extends "siteapp/base.html" %}
+
+{% block title %}Order Placed{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-7xl mx-auto px-6 thank-you-container">
+    <h1 class="thank-you-message">Thank you!</h1>
+    <p>Your order number is <strong>#{{ order.id }}</strong>.</p>
+
+    <div class="order-info card">
+        <h3>Order summary</h3>
+        <p><strong>Name:</strong> {{ order.customer_name }}</p>
+        <p><strong>Total:</strong> ₹{{ order.total }}</p>
+        <p><strong>Status:</strong> {{ order.get_status_display }}</p>
+        <p><strong>Payment method:</strong> {{ order.get_payment_method_display }}</p>
+        <p><strong>Payment status:</strong> {{ order.get_payment_status_display }}</p>
+    </div>
+
+    <div class="address-info card">
+        <h3>Shipping address</h3>
+        <p>
+            {{ order.address_line1 }}<br>
+            {% if order.address_line2 %}{{ order.address_line2 }}<br>{% endif %}
+            {{ order.city }} – {{ order.pincode }}
+        </p>
+    </div>
+
+    <div class="order-info card">
+        <h3>Items</h3>
+        <ul>{% for item in order.items.all %}<li>{{ item.variant.product.title }} – {{ item.variant.color }} – {{ item.variant.get_blouse_option_display }} – Qty: {{ item.quantity }} – ₹{{ item.price }}</li>{% endfor %}</ul>
+    </div>
+
+    <p><a href="{% url 'home' %}" class="btn-outline">Back to home</a></p>
+</div>
+{% endblock %}
